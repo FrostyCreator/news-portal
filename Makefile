@@ -1,9 +1,10 @@
 .DEFAULT_GOAL := run
 
-run:
-	go run cmd/news-portal/main.go
+build:
+	go mod download && go build -o ./.bin/news-portal ./cmd/news-portal/main.go
+
+run: build
+	./.bin/news-portal
+
 lint:
 	golangci-lint run
-
-
-

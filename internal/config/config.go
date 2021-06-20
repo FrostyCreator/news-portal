@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/FrostyCreator/news-portal/internal/logger"
 	"github.com/spf13/viper"
+	"os"
 	"time"
 )
 
@@ -37,18 +38,52 @@ func (c *Config) String() string {
 func GetConf(configPath string) (*Config, error) {
 	config := new(Config)
 
-	if err := setFromConfigFile(config, configPath); err != nil {
-		return nil, err
+	envVarExist := os.Getenv("ENV_VAR_EXISTS")
+
+	if envVarExist == "true" {
+		if err := setConfFromEnvVar(config); err != nil {
+			return nil, err
+		}
+	} else {
+		if err := setConfFromEnvFile(config); err != nil {
+			return nil, err
+		}
 	}
 
-	if err := setFromEnv(config); err != nil {
+	if err := setBasicConfigs(config, configPath); err != nil {
 		return nil, err
 	}
 
 	return config, nil
 }
 
-func setFromConfigFile(config *Config, configPath string) error {
+func setConfFromEnvFile(config *Config) error {
+	viper.AddConfigPath("./")
+	viper.SetConfigType("env")
+	viper.SetConfigName(".env")
+	viper.SetEnvPrefix("database")
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+
+	config.PostgreSQL.Host = viper.GetString("DATABASE_HOST")
+	config.PostgreSQL.User = viper.GetString("DATABASE_USER")
+	config.PostgreSQL.Password = viper.GetString("DATABASE_PASSWORD")
+
+	return nil
+}
+
+func setConfFromEnvVar(config *Config) error {
+	config.PostgreSQL.Host = os.Getenv("DATABASE_HOST")
+	config.PostgreSQL.User = os.Getenv("DATABASE_USER")
+	config.PostgreSQL.Password = os.Getenv("DATABASE_PASSWORD")
+
+	return nil
+}
+
+func setBasicConfigs(config *Config, configPath string) error {
 	viper.AddConfigPath(configPath)
 	viper.SetConfigName("main")
 	viper.SetConfigType("yml")
@@ -61,23 +96,6 @@ func setFromConfigFile(config *Config, configPath string) error {
 	if err := viper.Unmarshal(config); err != nil {
 		return err
 	}
-
-	return nil
-}
-
-func setFromEnv(config *Config) error {
-	viper.AddConfigPath(".")
-	viper.SetConfigName(".env")
-	viper.SetConfigType("dotenv")
-
-	if err := viper.ReadInConfig(); err != nil {
-		logger.LogErrorf("Error reading config file, %s", err)
-		return err
-	}
-
-	config.PostgreSQL.Host = viper.GetString("DATABASE_HOST")
-	config.PostgreSQL.User = viper.GetString("DATABASE_USER")
-	config.PostgreSQL.Password = viper.GetString("DATABASE_PASSWORD")
 
 	return nil
 }
