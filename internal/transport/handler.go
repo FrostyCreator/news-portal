@@ -17,7 +17,7 @@ func (h *Handler) Init() *echo.Echo {
 	e := echo.New()
 
 	e.GET("/ping", func(c echo.Context) error {
-		return c.String(http.StatusOK, "pong")
+		return c.JSON(http.StatusOK, "pong")
 	})
 
 	return e
