@@ -1,5 +1,0 @@
-build:
-  command:
-    go mod download && go build -o ./.bin/news-portal ./cmd/news-portal/main.go
-run:
-  web: ./.bin/news-portal
