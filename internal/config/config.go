@@ -97,5 +97,10 @@ func setBasicConfigs(config *Config, configPath string) error {
 		return err
 	}
 
+	portFromEnv := os.Getenv("PORT")
+	if portFromEnv != "" {
+		config.HTTP.Port = portFromEnv
+	}
+
 	return nil
 }
