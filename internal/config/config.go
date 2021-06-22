@@ -18,7 +18,7 @@ type (
 		Host     string
 		User     string
 		Password string
-		URL      string
+		URI      string
 		DBName   string `mapstructure:"database"`
 	}
 
@@ -72,7 +72,7 @@ func setConfFromEnvFile(config *Config) error {
 	config.PostgreSQL.Host = viper.GetString("DATABASE_HOST")
 	config.PostgreSQL.User = viper.GetString("DATABASE_USER")
 	config.PostgreSQL.Password = viper.GetString("DATABASE_PASSWORD")
-	config.PostgreSQL.URL = viper.GetString("DATABASE_URL")
+	config.PostgreSQL.URI = viper.GetString("DATABASE_URI")
 
 	return nil
 }
@@ -81,7 +81,7 @@ func setConfFromEnvVar(config *Config) error {
 	config.PostgreSQL.Host = os.Getenv("DATABASE_HOST")
 	config.PostgreSQL.User = os.Getenv("DATABASE_USER")
 	config.PostgreSQL.Password = os.Getenv("DATABASE_PASSWORD")
-	config.PostgreSQL.URL = viper.GetString("DATABASE_URL")
+	config.PostgreSQL.URI = viper.GetString("DATABASE_URI")
 
 	return nil
 }
