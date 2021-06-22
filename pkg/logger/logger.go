@@ -27,7 +27,7 @@ var (
 )
 
 func InitLogger() error {
-	exists, err := utils.IsDirExists(logDir)
+	exists, err := utils.DirExists(logDir)
 	if err != nil {
 		return err
 	}

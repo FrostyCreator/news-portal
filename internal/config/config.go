@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/FrostyCreator/news-portal/internal/logger"
+	"github.com/FrostyCreator/news-portal/pkg/logger"
 	"github.com/spf13/viper"
 	"os"
 	"time"
