@@ -3,9 +3,10 @@ package config
 import (
 	"fmt"
 	"github.com/FrostyCreator/news-portal/pkg/logger"
-	"github.com/spf13/viper"
 	"os"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 type (
@@ -18,8 +19,8 @@ type (
 		Host     string
 		User     string
 		Password string
-		URI      string
 		DBName   string `mapstructure:"database"`
+		Port     string `mapstructure:"port"`
 	}
 
 	HTTPConfig struct {
@@ -31,9 +32,9 @@ type (
 )
 
 func (c *Config) String() string {
-	return fmt.Sprintf("PostgreSQL configs:\n\tHost: %s\n\tUser: %s\n\tDB name: %s\n"+
+	return fmt.Sprintf("PostgreSQL configs:\n\tHost: %s:%s\n\tUser: %s\n\tDB name: %s\n"+
 		"HTTP configs:\n\tPort: %s\n\tRead timeout:%s\n\tWrite timeout: %s",
-		c.PostgreSQL.Host, c.PostgreSQL.User, c.PostgreSQL.DBName, c.HTTP.Port, c.HTTP.ReadTimeout, c.HTTP.WriteTimeout)
+		c.PostgreSQL.Host, c.PostgreSQL.Port, c.PostgreSQL.User, c.PostgreSQL.DBName, c.HTTP.Port, c.HTTP.ReadTimeout, c.HTTP.WriteTimeout)
 }
 
 func GetConf(configPath string) (*Config, error) {
@@ -72,7 +73,6 @@ func setConfFromEnvFile(config *Config) error {
 	config.PostgreSQL.Host = viper.GetString("DATABASE_HOST")
 	config.PostgreSQL.User = viper.GetString("DATABASE_USER")
 	config.PostgreSQL.Password = viper.GetString("DATABASE_PASSWORD")
-	config.PostgreSQL.URI = viper.GetString("DATABASE_URI")
 
 	return nil
 }
@@ -81,7 +81,6 @@ func setConfFromEnvVar(config *Config) error {
 	config.PostgreSQL.Host = os.Getenv("DATABASE_HOST")
 	config.PostgreSQL.User = os.Getenv("DATABASE_USER")
 	config.PostgreSQL.Password = os.Getenv("DATABASE_PASSWORD")
-	config.PostgreSQL.URI = viper.GetString("DATABASE_URI")
 
 	return nil
 }

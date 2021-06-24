@@ -32,10 +32,8 @@ jobs:
             DATABASE_HOST
             DATABASE_USER
             DATABASE_PASSWORD
-            DATABASE_URI
         env:
           ENV_VAR_EXISTS: true
           DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_URI: ${{ secrets.DATABASE_URI }}

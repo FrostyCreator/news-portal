@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 	"github.com/FrostyCreator/news-portal/internal/config"
+	"github.com/FrostyCreator/news-portal/internal/repository"
 	"github.com/FrostyCreator/news-portal/internal/server"
+	"github.com/FrostyCreator/news-portal/internal/service"
 	"github.com/FrostyCreator/news-portal/internal/transport"
+	"github.com/FrostyCreator/news-portal/pkg/database/pg"
 	"github.com/FrostyCreator/news-portal/pkg/logger"
 	"log"
 	"net/http"
@@ -32,9 +35,21 @@ func main() {
 		logger.LogFatal("Config is nil")
 	}
 
-	handlers := transport.NewHandler()
+	db, err := pg.NewDB(cfg.PostgreSQL)
+	if err != nil {
+		logger.LogFatal(err)
+	}
 
-	// HTTP Server
+	err = db.Ping(context.Background())
+	if err != nil {
+		logger.LogFatal(err)
+	}
+
+	repo := repository.NewRepository(db)
+	services := service.InitService(repo)
+
+	handlers := transport.NewHandler(services)
+
 	srv := server.NewServer(cfg, handlers.Init())
 
 	go func() {
@@ -59,5 +74,4 @@ func main() {
 	if err := srv.Stop(ctx); err != nil {
 		logger.LogErrorf("failed to stop server: %v", err)
 	}
-
 }
