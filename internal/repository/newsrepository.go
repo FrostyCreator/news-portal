@@ -27,7 +27,7 @@ func (repo *NewsRepo) Create(ctx context.Context, news *domain.News) error {
 	_, err := repo.db.Exec(ctx, query, news.Title, news.Text)
 	if err != nil {
 		logger.LogErrorf("Query: %s", query)
-		logger.LogError("Arguments: %s, %s", news.Title, news.Text)
+		logger.LogErrorf("Arguments: %s, %s", news.Title, news.Text)
 		return err
 	}
 
@@ -80,7 +80,7 @@ func (repo *NewsRepo) Update(ctx context.Context, news *domain.News) error {
 	_, err := repo.db.Exec(ctx, query, news.Title, news.Text, news.ID)
 	if err != nil {
 		logger.LogErrorf("Query: %s", query)
-		logger.LogError("Arguments: %s, %s", news.Title, news.Text, news.ID)
+		logger.LogErrorf("Arguments: %s, %s", news.Title, news.Text, news.ID)
 		return err
 	}
 
@@ -93,7 +93,7 @@ func (repo *NewsRepo) DeleteById(ctx context.Context, id uuid.UUID) error {
 	_, err := repo.db.Exec(ctx, query, id)
 	if err != nil {
 		logger.LogErrorf("Query: %s", query)
-		logger.LogError("Arguments: %s", id.String())
+		logger.LogErrorf("Arguments: %s", id.String())
 		return err
 	}
 
