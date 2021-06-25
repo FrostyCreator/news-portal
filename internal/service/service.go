@@ -5,11 +5,13 @@ import (
 )
 
 type Service struct {
-	News repository.News
+	News    repository.News
+	Authors repository.Author
 }
 
 func InitService(repo *repository.Repository) *Service {
 	return &Service{
-		News: repo.News,
+		News:    repo.News,
+		Authors: repo.Author,
 	}
 }

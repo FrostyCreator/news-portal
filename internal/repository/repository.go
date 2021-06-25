@@ -16,12 +16,22 @@ type News interface {
 	DeleteById(ctx context.Context, id uuid.UUID) error
 }
 
+type Author interface {
+	Create(ctx context.Context, a *domain.Author) error
+	Get(ctx context.Context, count int) (*[]*domain.Author, error)
+	GetById(ctx context.Context, id uuid.UUID) (*domain.Author, error)
+	Update(ctx context.Context, a *domain.Author) error
+	DeleteById(ctx context.Context, id uuid.UUID) error
+}
+
 type Repository struct {
-	News News
+	News   News
+	Author Author
 }
 
 func NewRepository(db *database.DB) *Repository {
 	return &Repository{
-		News: NewNewsRepo(db),
+		News:   NewNewsRepo(db),
+		Author: NewAuthorRepo(db),
 	}
 }

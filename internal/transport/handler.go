@@ -33,6 +33,7 @@ func (h *Handler) initAPI(e *echo.Echo) {
 	api := e.Group("/api")
 	{
 		h.initNewsRoutes(api)
+		h.initAuthorRoutes(api)
 	}
 }
 
@@ -44,5 +45,16 @@ func (h *Handler) initNewsRoutes(e *echo.Group) {
 		news.POST("", h.createNews)
 		news.PUT("", h.updateNews)
 		news.DELETE("", h.deleteNews)
+	}
+}
+
+func (h *Handler) initAuthorRoutes(e *echo.Group) {
+	news := e.Group("/author")
+	{
+		news.GET("", h.getAuthors)
+		news.GET("/:id", h.getAuthorById)
+		news.POST("", h.createAuthor)
+		news.PUT("", h.updateAuthor)
+		news.DELETE("", h.deleteAuthor)
 	}
 }
