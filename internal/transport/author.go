@@ -54,6 +54,23 @@ func (h *Handler) getAuthorById(c echo.Context) error {
 	return c.JSON(http.StatusBadRequest, author)
 }
 
+func (h *Handler) GetAuthorNews(c echo.Context) error {
+	idInQuery := c.Param("id")
+
+	id, err := uuid.Parse(idInQuery)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequest("invalid id param"))
+	}
+
+	news, err := h.Service.AuthorsWithNews.GetAuthorNews(c.Request().Context(), id)
+	if err != nil {
+		logger.LogError(err)
+		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get object from repo: %s", err))
+	}
+
+	return c.JSON(http.StatusBadRequest, news)
+}
+
 func (h *Handler) createAuthor(c echo.Context) error {
 	author := new(domain.Author)
 

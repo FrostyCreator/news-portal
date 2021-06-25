@@ -3,6 +3,7 @@ package transport
 import (
 	"github.com/FrostyCreator/news-portal/internal/domain"
 	"github.com/FrostyCreator/news-portal/internal/utils"
+	"github.com/FrostyCreator/news-portal/pkg/logger"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -48,6 +49,23 @@ func (h *Handler) getNewsById(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusBadRequest, news)
+}
+
+func (h *Handler) GetNewsAuthors(c echo.Context) error {
+	idInQuery := c.Param("id")
+
+	id, err := uuid.Parse(idInQuery)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequest("invalid id param"))
+	}
+
+	authors, err := h.Service.AuthorsWithNews.GetNewsAuthors(c.Request().Context(), id)
+	if err != nil {
+		logger.LogError(err)
+		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get object from repo: %s", err))
+	}
+
+	return c.JSON(http.StatusBadRequest, authors)
 }
 
 func (h *Handler) createNews(c echo.Context) error {

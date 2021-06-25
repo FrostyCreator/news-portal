@@ -24,14 +24,21 @@ type Author interface {
 	DeleteById(ctx context.Context, id uuid.UUID) error
 }
 
+type AuthorWithNews interface {
+	GetAuthorNews(ctx context.Context, authorId uuid.UUID) (*[]domain.News, error)
+	GetNewsAuthors(ctx context.Context, newsId uuid.UUID) (*[]domain.Author, error)
+}
+
 type Repository struct {
-	News   News
-	Author Author
+	News       News
+	Author     Author
+	AuthorNews AuthorWithNews
 }
 
 func NewRepository(db *database.DB) *Repository {
 	return &Repository{
-		News:   NewNewsRepo(db),
-		Author: NewAuthorRepo(db),
+		News:       NewNewsRepo(db),
+		Author:     NewAuthorRepo(db),
+		AuthorNews: NewAuthorNewsRepo(db),
 	}
 }
