@@ -13,7 +13,7 @@ import (
 
 const defaultCountNews = 50
 
-func (h *Handler) getNews(c echo.Context) error {
+func (h Handler) getNewsWithAuthors(c echo.Context) error {
 	countInQuery := c.QueryParam("count")
 
 	var err error
@@ -32,7 +32,22 @@ func (h *Handler) getNews(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get objects from repo: %s", err))
 	}
 
-	return c.JSON(http.StatusBadRequest, news)
+	newsWithAuthors := domain.NewsWithAuthors{}
+	oneNewsWithAuthors := domain.OneNewsWithAuthors{}
+
+	for _, n := range *news {
+		oneNewsWithAuthors.News = *n
+		authors, err := h.Service.AuthorsWithNews.GetNewsAuthors(c.Request().Context(), n.ID)
+		if err != nil {
+			logger.LogError(err)
+			return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get objects from repo: %s", err))
+		}
+		oneNewsWithAuthors.Authors = *authors
+
+		newsWithAuthors = append(newsWithAuthors, oneNewsWithAuthors)
+	}
+
+	return c.JSON(http.StatusBadRequest, newsWithAuthors)
 }
 
 func (h *Handler) getNewsById(c echo.Context) error {
