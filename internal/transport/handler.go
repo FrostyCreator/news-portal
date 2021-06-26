@@ -44,8 +44,9 @@ func (h *Handler) initNewsRoutes(e *echo.Group) {
 		news.GET("/:id", h.getNewsById)
 		news.GET("/getauthors/:id", h.GetNewsAuthors)
 		news.POST("", h.createNews)
+		news.POST("/setnewstoauthor", h.setNewsToAuthor)
 		news.PUT("", h.updateNews)
-		news.DELETE("", h.deleteNews)
+		news.DELETE("/:id", h.deleteNews)
 	}
 }
 

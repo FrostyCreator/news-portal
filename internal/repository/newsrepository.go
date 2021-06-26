@@ -21,17 +21,19 @@ func NewNewsRepo(db *database.DB) *NewsRepo {
 	}
 }
 
-func (repo *NewsRepo) Create(ctx context.Context, news *domain.News) error {
-	query := "INSERT INTO news.tbl_news (id, title, text, created_at) VALUES (DEFAULT, $1, $2, DEFAULT)"
+func (repo *NewsRepo) Create(ctx context.Context, news *domain.News) (*uuid.UUID, error) {
+	query := "INSERT INTO news.tbl_news (id, title, text, created_at) VALUES ($1, $2, $3, DEFAULT)"
 
-	_, err := repo.db.Exec(ctx, query, news.Title, news.Text)
+	id := uuid.New()
+
+	_, err := repo.db.Exec(ctx, query, id, news.Title, news.Text)
 	if err != nil {
 		logger.LogErrorf("Query: %s", query)
 		logger.LogErrorf("Arguments: %s, %s", news.Title, news.Text)
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &id, nil
 }
 
 func (repo *NewsRepo) Get(ctx context.Context, count int) (*[]*domain.News, error) {

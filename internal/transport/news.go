@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"fmt"
 	"github.com/FrostyCreator/news-portal/internal/domain"
 	"github.com/FrostyCreator/news-portal/internal/utils"
 	"github.com/FrostyCreator/news-portal/pkg/logger"
@@ -47,7 +48,7 @@ func (h Handler) getNewsWithAuthors(c echo.Context) error {
 		newsWithAuthors = append(newsWithAuthors, oneNewsWithAuthors)
 	}
 
-	return c.JSON(http.StatusBadRequest, newsWithAuthors)
+	return c.JSON(http.StatusOK, newsWithAuthors)
 }
 
 func (h *Handler) getNewsById(c echo.Context) error {
@@ -63,7 +64,7 @@ func (h *Handler) getNewsById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get object from repo: %s", err))
 	}
 
-	return c.JSON(http.StatusBadRequest, news)
+	return c.JSON(http.StatusOK, news)
 }
 
 func (h *Handler) GetNewsAuthors(c echo.Context) error {
@@ -80,7 +81,7 @@ func (h *Handler) GetNewsAuthors(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get object from repo: %s", err))
 	}
 
-	return c.JSON(http.StatusBadRequest, authors)
+	return c.JSON(http.StatusOK, authors)
 }
 
 func (h *Handler) createNews(c echo.Context) error {
@@ -94,8 +95,42 @@ func (h *Handler) createNews(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequest("invalid news param"))
 	}
 
-	if err := h.Service.News.Create(c.Request().Context(), news); err != nil {
+	id, err := h.Service.News.Create(c.Request().Context(), news)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed create news: %s", err))
+	}
+
+	return c.JSON(http.StatusOK, id)
+}
+
+func (h *Handler) setNewsToAuthor(c echo.Context) error {
+	dataFromQuery := struct {
+		AuthorsIds []string `json:"authors_ids" form:"authors_ids"`
+		NewsId     string   `json:"news_id" form:"news_id"`
+	}{}
+
+	err := c.Bind(&dataFromQuery)
+	if err != nil {
+		logger.LogError(err)
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequest("invalid authors ids param"))
+	}
+
+	fmt.Println("authorIdFromReq -", dataFromQuery)
+
+	newsId, err := uuid.Parse(dataFromQuery.NewsId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewBadRequest("invalid news id param"))
+	}
+
+	for _, authorId := range dataFromQuery.AuthorsIds {
+		authId, err := uuid.Parse(authorId)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, utils.NewBadRequest("invalid author id param"))
+		}
+		if err := h.Service.AuthorsWithNews.SetNewsAuthors(c.Request().Context(), newsId, authId); err != nil {
+			return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed create news: %s", err))
+		}
+
 	}
 
 	return c.JSON(http.StatusOK, "ok")
@@ -120,14 +155,16 @@ func (h *Handler) updateNews(c echo.Context) error {
 }
 
 func (h *Handler) deleteNews(c echo.Context) error {
-	idInQuery := c.FormValue("id")
+	idInQuery := c.Param("id")
 
 	id, err := uuid.Parse(idInQuery)
 	if err != nil {
+		logger.LogError(err)
 		return c.JSON(http.StatusBadRequest, utils.NewBadRequest("invalid id param"))
 	}
 
 	if err = h.Service.News.DeleteById(c.Request().Context(), id); err != nil {
+		logger.LogError(err)
 		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed delete news: %s", err))
 	}
 

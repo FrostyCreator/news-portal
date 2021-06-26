@@ -62,3 +62,15 @@ func (repo AuthorNewsRepo) GetNewsAuthors(ctx context.Context, newsId uuid.UUID)
 
 	return &authors, nil
 }
+
+func (repo AuthorNewsRepo) SetNewsAuthors(ctx context.Context, newsId, authorId uuid.UUID) error {
+	query := "INSERT INTO news.tbl_author_news (id, author_id, news_id) VALUES (DEFAULT, $1, $2);"
+	_, err := repo.db.Exec(ctx, query, authorId, newsId)
+	if err != nil {
+		logger.LogErrorf("Query: %s", query)
+		logger.LogErrorf("Arguments: %s", authorId, newsId)
+		return err
+	}
+
+	return nil
+}

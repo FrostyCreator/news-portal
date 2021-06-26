@@ -33,7 +33,7 @@ func (h *Handler) getAuthors(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get objects from repo: %s", err))
 	}
 
-	return c.JSON(http.StatusBadRequest, authors)
+	return c.JSON(http.StatusOK, authors)
 }
 
 func (h *Handler) getAuthorById(c echo.Context) error {
@@ -51,7 +51,7 @@ func (h *Handler) getAuthorById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get object from repo: %s", err))
 	}
 
-	return c.JSON(http.StatusBadRequest, author)
+	return c.JSON(http.StatusOK, author)
 }
 
 func (h *Handler) GetAuthorNews(c echo.Context) error {
@@ -68,7 +68,7 @@ func (h *Handler) GetAuthorNews(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get object from repo: %s", err))
 	}
 
-	return c.JSON(http.StatusBadRequest, news)
+	return c.JSON(http.StatusOK, news)
 }
 
 func (h *Handler) createAuthor(c echo.Context) error {

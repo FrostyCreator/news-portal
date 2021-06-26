@@ -9,7 +9,7 @@ import (
 )
 
 type News interface {
-	Create(ctx context.Context, news *domain.News) error
+	Create(ctx context.Context, news *domain.News) (*uuid.UUID, error)
 	Get(ctx context.Context, count int) (*[]*domain.News, error)
 	GetById(ctx context.Context, id uuid.UUID) (*domain.News, error)
 	Update(ctx context.Context, news *domain.News) error
@@ -27,6 +27,7 @@ type Author interface {
 type AuthorWithNews interface {
 	GetAuthorNews(ctx context.Context, authorId uuid.UUID) (*[]domain.News, error)
 	GetNewsAuthors(ctx context.Context, newsId uuid.UUID) (*[]domain.Author, error)
+	SetNewsAuthors(ctx context.Context, newsId, authorId uuid.UUID) error
 }
 
 type Repository struct {
