@@ -50,6 +50,43 @@ func (h Handler) getNewsWithAuthors(c echo.Context) error {
 	return c.JSON(http.StatusBadRequest, newsWithAuthors)
 }
 
+func (h Handler) getNewsWithAuthors(c echo.Context) error {
+	countInQuery := c.QueryParam("count")
+
+	var err error
+	count := 0
+
+	if countInQuery == "" {
+		count = defaultCountNews
+	} else {
+		if count, err = strconv.Atoi(countInQuery); err != nil {
+			return c.JSON(http.StatusBadRequest, utils.NewBadRequest("invalid count param"))
+		}
+	}
+
+	news, err := h.Service.News.Get(c.Request().Context(), count)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get objects from repo: %s", err))
+	}
+
+	newsWithAuthors := domain.NewsWithAuthors{}
+	oneNewsWithAuthors := domain.OneNewsWithAuthors{}
+
+	for _, n := range *news {
+		oneNewsWithAuthors.News = *n
+		authors, err := h.Service.AuthorsWithNews.GetNewsAuthors(c.Request().Context(), n.ID)
+		if err != nil {
+			logger.LogError(err)
+			return c.JSON(http.StatusBadRequest, utils.NewInternalf("failed get objects from repo: %s", err))
+		}
+		oneNewsWithAuthors.Authors = *authors
+
+		newsWithAuthors = append(newsWithAuthors, oneNewsWithAuthors)
+	}
+
+	return c.JSON(http.StatusBadRequest, newsWithAuthors)
+}
+
 func (h *Handler) getNewsById(c echo.Context) error {
 	idInQuery := c.Param("id")
 
