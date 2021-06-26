@@ -40,7 +40,7 @@ func (h *Handler) initAPI(e *echo.Echo) {
 func (h *Handler) initNewsRoutes(e *echo.Group) {
 	news := e.Group("/news")
 	{
-		news.GET("", h.getNews)
+		news.GET("", h.getNewsWithAuthors)
 		news.GET("/:id", h.getNewsById)
 		news.GET("/getauthors/:id", h.GetNewsAuthors)
 		news.POST("", h.createNews)
